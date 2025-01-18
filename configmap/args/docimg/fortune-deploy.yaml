@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fortune5s-deployment
+  labels:
+    app: fortune5s
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fortune5s
+  template:
+    metadata:
+      labels:
+        app: fortune5s
+    spec:
+      containers:
+      - image: lulu00/fortune-args
+        name: html-generator
+        args: ["5"]
+        volumeMounts:
+        - name: html
+          mountPath: /var/htdocs
+      - image: nginx:alpine
+        name: web-server
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+          readOnly: true
+        ports:
+        - containerPort: 80
+          protocol: TCP
+      volumes:
+      - name: html
+        emptyDir: {}
