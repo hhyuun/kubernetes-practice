@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      tier: frontend
+    matchExpressions: # 감시대상
+      - {key: env, operator: In, values: [prod]}
+      - {key: priority, operator: NotIn, values: [low]}
+  template:
+    metadata:
+      labels:
+        tier: frontend
+        env: prod
+        priority: high # low만 아니면 medium이든 뭐든 감시대상
+    spec:
+      containers:
+      - name: php-redis
+        image: gcr.io/google_samples/gb-frontend:v5
